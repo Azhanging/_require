@@ -1,0 +1,39 @@
+{
+	"name": "require",
+	"version": "1.0.0",
+	"description": "javascript module",
+	"main": "gulpfile.js",
+	"dependencies": {
+		"browser-sync": "^2.9.3",
+		"gulp": "^3.9.0",
+		"gulp-concat": "^2.6.0",
+		"gulp-jshint": "^1.11.2",
+		"gulp-clean-css": "^2.0.x",
+		"gulp-sass": "^2.0.4",
+		"gulp-uglify": "^1.4.2"
+	},
+	"devDependencies": {
+		"browser-sync": "^2.14.0",
+		"del": "^2.2.2",
+		"gulp": "^3.9.1",
+		"gulp-autoprefixer": "^3.1.1",
+		"gulp-htmlmin": "^2.0.0",
+		"gulp-rev-append": "^0.1.6",
+		"gulp-webpack": "^1.5.0",
+		"webpack": "^1.13.2",
+		"webpack-stream": "^3.2.0"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Azhanging/_require.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Azhanging/_require/issues"
+	},
+	"homepage": "https://github.com/Azhanging/_require#readme"
+}
