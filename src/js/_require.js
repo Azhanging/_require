@@ -2,7 +2,6 @@
  *2016-10-18 16:00:50 
  * fyc构建
  * */
-var arr = [];
 (function(window) {
 	//模块
 	var _require,
