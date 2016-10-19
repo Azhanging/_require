@@ -11,7 +11,7 @@
 	id为字符串类型,通过_require(id)可以获取到暴露的接口;
 	fn为模块的执行函数,内部定义暴露内部的接口;
 ***
-###_require.config:
+###_require.config = {}
 	path(数组类型):引入模块的路径
 	
 
