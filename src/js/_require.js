@@ -6,7 +6,7 @@
 	//模块
 	var _require,
 		//模块列表
-		moduleLists = {
+		modules = {
 			//模块路径
 			modulePaths: [],
 			//模块id名
@@ -51,11 +51,11 @@
 	_require = function(id) {
 		if(typeof id === 'string') {
 			//从模块中获取对象
-			var moduleIndex = moduleLists.moduleIdNames.indexOf(id);
+			var moduleIndex = modules.moduleIdNames.indexOf(id);
 			if(moduleIndex === -1) {
 				console.warn('找不到' + id + '模块!');
 			} else {
-				return moduleLists.moduleExports[moduleLists.moduleIdNames[moduleIndex]];
+				return modules.moduleExports[modules.moduleIdNames[moduleIndex]];
 			}
 		} else {
 			console.warn('文件引用id必须为字符串!');
@@ -68,12 +68,12 @@
 		if(typeof id === 'string') {
 			if(typeof fn === 'function') {
 				//是否已存在同样id的模块名
-				if(moduleLists.moduleIdNames.indexOf(id) === -1) {
+				if(modules.moduleIdNames.indexOf(id) === -1) {
 					var exports = new fn();
 					//储存模块名
-					moduleLists.moduleIdNames.push(id);
+					modules.moduleIdNames.push(id);
 					//索引模块暴露的接口
-					moduleLists.moduleExports[id] = exports;
+					modules.moduleExports[id] = exports;
 				} else {
 					console.warn('存在相同' + id + '的模块!');
 				}
@@ -100,7 +100,7 @@
 					script.src = jsPath[i];
 					_$.getEls('head')[0].appendChild(script);
 					//把模块文件索引推送到模块列表,方便获取
-					moduleLists.modulePaths.push(jsPath[i]);
+					modules.modulePaths.push(jsPath[i]);
 					//监听所有的script加载情况
 					isLoadEnd.push(false);
 					script.onload = (function(i) {
@@ -124,7 +124,6 @@
 					})(i);
 				}
 			}
-			console.log(moduleLists);
 		} else {
 			console.warn('_require.config配置有误!');
 		}
