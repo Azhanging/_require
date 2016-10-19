@@ -2,6 +2,7 @@
  *2016-10-18 16:00:50 
  * fyc构建
  * */
+var arr = [];
 (function(window) {
 	//模块
 	var _require,
@@ -72,8 +73,12 @@
 		//id不能为数字
 		if(typeof id === 'string') {
 			if(typeof fn === 'function') {
+
+
 				//是否已存在同样id的模块名
 				if(modules.moduleIdNames.indexOf(id) === -1) {
+					//储存模块名
+					modules.moduleIdNames.push(id);
 					//模块函数推入到临时的数组内,在调用结束后执行
 					modules.moduleFns[id] = fn;
 
@@ -116,14 +121,14 @@
 									}
 								}
 								//循环接口函数数组
-								for(var k in modules.moduleFns) {
-									//执行临时的接口函数,抛出接口
-//									var exports = modules.moduleFns[k]();
-									//储存模块名
-									modules.moduleIdNames.push(k);
-									//索引模块暴露的接口
-//									modules.moduleExports[k] = exports;
-								}
+//								for(var k in modules.moduleFns) {
+//									//执行临时的接口函数,抛出接口
+//									/*var exports = modules.moduleFns[k]();*/
+//									//储存模块名
+//									/*modules.moduleIdNames.push(k);*/
+//									//索引模块暴露的接口
+//									/*modules.moduleExports[k] = exports;*/
+//								}
 								//所有模块加载完毕后的回调函数
 								callback();
 							}
