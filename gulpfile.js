@@ -24,7 +24,8 @@ var src = {
 	watch: {
 		js: {
 			path: [
-				'src/js/*.js'
+				'src/js/*.js',
+				'src/js/modules/*.js'
 			],
 			task: 'concat'
 		}
