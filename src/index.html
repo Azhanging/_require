@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script src="js/_require.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body>
+		<div id="el"></div>
+		<script type="text/javascript">
+			_require.config = {
+				path:[
+					'js/m1.js',
+					'js/m2.js'
+				]
+			}
+			_require.use(function(){
+				var _1 = _require('js/m1.js');
+				var _2 = _require('js/m2.js');
+				_1.a('el',123);
+				_2.b('el',456);
+			});
+		</script>
+	</body>
+</html>
