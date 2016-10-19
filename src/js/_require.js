@@ -13,7 +13,7 @@
 			moduleIdNames: [],
 			//模块暴露接口
 			moduleExports: {},
-			//临时的接口函数
+			//模块接口函数
 			moduleFns: {}
 		},
 		//判断模块是否加载
@@ -59,6 +59,7 @@
 			if(moduleIndex === -1) {
 				console.warn('找不到' + id + '模块!');
 			} else {
+				//返回暴露的接口
 				return new modules.moduleFns[id]();
 			}
 		} else {
@@ -114,7 +115,7 @@
 										return;
 									}
 								}
-								//循环临时的接口函数数组
+								//循环接口函数数组
 								for(var k in modules.moduleFns) {
 									//执行临时的接口函数,抛出接口
 									var exports = modules.moduleFns[k]();
