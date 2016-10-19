@@ -7,12 +7,14 @@ _require.define('m1',function(){
 	function changeB(i){
 		b = i;
 		console.log(b);
+	}
+	function bb(){
 		return b;
 	}
 	return{
 		a:a,
 		c:changeB,
-		b:b
+		bb:bb
 	}
 });
 

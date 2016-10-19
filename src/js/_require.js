@@ -14,7 +14,7 @@
 			//模块暴露接口
 			moduleExports: {},
 			//临时的接口函数
-			moduleTmpFns: {}
+			moduleFns: {}
 		},
 		//判断模块是否加载
 		isLoadEnd = [],
@@ -59,7 +59,7 @@
 			if(moduleIndex === -1) {
 				console.warn('找不到' + id + '模块!');
 			} else {
-				return modules.moduleExports[modules.moduleIdNames[moduleIndex]];
+				return new modules.moduleFns[id]();
 			}
 		} else {
 			console.warn('文件引用id必须为字符串!');
@@ -74,7 +74,7 @@
 				//是否已存在同样id的模块名
 				if(modules.moduleIdNames.indexOf(id) === -1) {
 					//模块函数推入到临时的数组内,在调用结束后执行
-					modules.moduleTmpFns[id] = fn;
+					modules.moduleFns[id] = fn;
 
 				} else {
 					console.warn('存在相同' + id + '的模块!');
@@ -87,7 +87,7 @@
 		}
 	}
 
-	/*开始模块构建初始化引入js文件*/
+	/*开始模块构建初始化引入模块文件*/
 	_require.use = function(callback) {
 			if(_require.config instanceof Object) {
 				var jsPath = _require.config.path;
@@ -115,9 +115,9 @@
 									}
 								}
 								//循环临时的接口函数数组
-								for(var k in modules.moduleTmpFns) {
+								for(var k in modules.moduleFns) {
 									//执行临时的接口函数,抛出接口
-									var exports = modules.moduleTmpFns[k]();
+									var exports = modules.moduleFns[k]();
 									//储存模块名
 									modules.moduleIdNames.push(k);
 									//索引模块暴露的接口
