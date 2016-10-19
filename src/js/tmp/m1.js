@@ -1,1 +1,1 @@
-_require.define("m1",function(){function e(e,n){var e=document.getElementById(e);e.innerHTML=n}return{a:e}});
+_require.define("m1",function(){function n(n,e){var n=document.getElementById(n);n.innerHTML=r}function e(n){r=n}var r=1;return{a:n,c:e,b:r}});

@@ -1,26 +1,42 @@
 <!DOCTYPE html>
 <html>
+
 	<head>
 		<meta charset="utf-8" />
 		<title></title>
 		<script src="js/_require.js" type="text/javascript" charset="utf-8"></script>
 	</head>
+
 	<body>
 		<div id="el"></div>
-		<script type="text/javascript">
+		<!--<script type="text/javascript">
 			_require.config = {
-				path:[
-					'js/modules/modules.js'
-//					'js/modules/m1.js',
-//					'js/modules/m2.js'
+				path: [
+					//'js/modules/modules.js'
+					'js/modules/m1.js',
+					'js/modules/m2.js'
 				]
 			}
-			_require.use(function(){
+			_require.use(function() {
 				var _1 = _require('m1');
+				var _11 = _require('m1');
+
+				_1.c(78);
+				console.log(_1.c(12));
+				console.log(_1.b);
 				var _2 = _require('m2');
-				_1.a('el',123);
-				_2.b('el',456);
 			});
+		</script>-->
+		<script type="text/javascript">
+			var c = (function() {
+				var a = 1;
+				function aa() {
+					a = 2;
+				}
+			})()
+
+			aa();
 		</script>
 	</body>
+
 </html>

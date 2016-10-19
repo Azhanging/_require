@@ -12,8 +12,12 @@
 			//模块id名
 			moduleIdNames: [],
 			//模块暴露接口
-			moduleExports: {}
+			moduleExports: {},
+			//临时的接口函数
+			moduleTmpFns: {}
 		},
+		//判断模块是否加载
+		isLoadEnd = [],
 		//获取对象
 		_$;
 
@@ -69,11 +73,9 @@
 			if(typeof fn === 'function') {
 				//是否已存在同样id的模块名
 				if(modules.moduleIdNames.indexOf(id) === -1) {
-					var exports = new fn();
-					//储存模块名
-					modules.moduleIdNames.push(id);
-					//索引模块暴露的接口
-					modules.moduleExports[id] = exports;
+					//模块函数推入到临时的数组内,在调用结束后执行
+					modules.moduleTmpFns[id] = fn;
+
 				} else {
 					console.warn('存在相同' + id + '的模块!');
 				}
@@ -87,47 +89,56 @@
 
 	/*开始模块构建初始化引入js文件*/
 	_require.use = function(callback) {
-		if(_require.config instanceof Object) {
-			var jsPath = _require.config.path,
-				//判断模块是否加载
-				isLoadEnd = [];
-			if(jsPath instanceof Array) {
-				var len = jsPath.length,
-					i = 0;
-				//把模块引入到文件中
-				for(; i < len; i++) {
-					var script = document.createElement('script');
-					script.src = jsPath[i];
-					_$.getEls('head')[0].appendChild(script);
-					//把模块文件索引推送到模块列表,方便获取
-					modules.modulePaths.push(jsPath[i]);
-					//监听所有的script加载情况
-					isLoadEnd.push(false);
-					script.onload = (function(i) {
-						return function() {
-							isLoadEnd[i] = true;
-							//判断所有的模块加载是否完毕
-							for(var j = 0, l = isLoadEnd.length; j < l; j++) {
-								if(!isLoadEnd[j]) {
-									return;
+			if(_require.config instanceof Object) {
+				var jsPath = _require.config.path;
+				if(jsPath instanceof Array) {
+					var len = jsPath.length,
+						i = 0;
+					//把模块引入到文件中
+					for(; i < len; i++) {
+						var script = document.createElement('script');
+						script.src = jsPath[i];
+						_$.getEls('head')[0].appendChild(script);
+						//把模块文件索引推送到模块列表,方便获取
+						modules.modulePaths.push(jsPath[i]);
+						//监听所有的script加载情况
+						isLoadEnd.push(false);
+						//加载模块成功
+						script.onload = (function(i) {
+							return function() {
+								isLoadEnd[i] = true;
+								//判断所有的模块加载是否完毕
+								console.log(isLoadEnd);
+								for(var j = 0, l = isLoadEnd.length; j < l; j++) {
+									if(!isLoadEnd[j]) {
+										return;
+									}
 								}
+								//循环临时的接口函数数组
+								for(var k in modules.moduleTmpFns) {
+									//执行临时的接口函数,抛出接口
+									var exports = modules.moduleTmpFns[k]();
+									//储存模块名
+									modules.moduleIdNames.push(k);
+									//索引模块暴露的接口
+									modules.moduleExports[k] = exports;
+								}
+								//所有模块加载完毕后的回调函数
+								callback();
 							}
-							//所有模块加载完毕后的回调函数
-							callback();
-						}
-					})(i);
-					//加载模块错误
-					script.onerror = (function(i) {
-						return function() {
-							console.warn(jsPath[i] + '模块加载有误!');
-						}
-					})(i);
+						})(i);
+						//加载模块错误
+						script.onerror = (function(i) {
+							return function() {
+								console.warn(jsPath[i] + '模块加载有误!');
+							}
+						})(i);
+					}
 				}
+			} else {
+				console.warn('_require.config配置有误!');
 			}
-		} else {
-			console.warn('_require.config配置有误!');
 		}
-	}
-	/*当前库暴露*/
+		/*当前库暴露*/
 	window._require = _require;
 })(window);
