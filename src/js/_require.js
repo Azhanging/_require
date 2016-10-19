@@ -118,11 +118,11 @@
 								//循环接口函数数组
 								for(var k in modules.moduleFns) {
 									//执行临时的接口函数,抛出接口
-									var exports = modules.moduleFns[k]();
+//									var exports = modules.moduleFns[k]();
 									//储存模块名
 									modules.moduleIdNames.push(k);
 									//索引模块暴露的接口
-									modules.moduleExports[k] = exports;
+//									modules.moduleExports[k] = exports;
 								}
 								//所有模块加载完毕后的回调函数
 								callback();
