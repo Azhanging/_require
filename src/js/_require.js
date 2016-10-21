@@ -110,7 +110,6 @@
 							return function() {
 								isLoadEnd[i] = true;
 								//判断所有的模块加载是否完毕
-								console.log(isLoadEnd);
 								for(var j = 0, l = isLoadEnd.length; j < l; j++) {
 									if(!isLoadEnd[j]) {
 										return;
