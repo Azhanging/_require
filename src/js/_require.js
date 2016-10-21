@@ -122,7 +122,7 @@
 						//加载模块错误
 						script.onerror = (function(i) {
 							return function() {
-								console.warn(modulePaths[i] + '模块加载有误!');
+								throw(modulePaths[i] + '模块加载有误!');
 							}
 						})(i);
 					}
