@@ -92,17 +92,17 @@
 	/*开始模块构建初始化引入模块文件*/
 	_require.use = function(callback) {
 			if(_require.config instanceof Object) {
-				var jsPath = _require.config.path;
-				if(jsPath instanceof Array) {
-					var len = jsPath.length,
+				var modulePaths = _require.config.path;
+				if(modulePaths instanceof Array) {
+					var len = modulePaths.length,
 						i = 0;
 					//把模块引入到文件中
 					for(; i < len; i++) {
 						var script = document.createElement('script');
-						script.src = jsPath[i];
+						script.src = modulePaths[i];
 						_$.getEls('head')[0].appendChild(script);
 						//把模块文件索引推送到模块列表,方便获取
-						modules.modulePaths.push(jsPath[i]);
+						modules.modulePaths.push(modulePaths[i]);
 						//监听所有的script加载情况
 						isLoadEnd.push(false);
 						//加载模块成功
@@ -122,7 +122,7 @@
 						//加载模块错误
 						script.onerror = (function(i) {
 							return function() {
-								console.warn(jsPath[i] + '模块加载有误!');
+								console.warn(modulePaths[i] + '模块加载有误!');
 							}
 						})(i);
 					}
