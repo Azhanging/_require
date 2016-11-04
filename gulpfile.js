@@ -4,13 +4,9 @@ var gulp = require('gulp'),
 	sass = require('gulp-sass'),
 	concat = require('gulp-concat'),
 	uglify = require('gulp-uglify'),
-	jshint = require('gulp-jshint'),
-	cssmin = require('gulp-clean-css'),
-	htmlmin = require('gulp-htmlmin'),
 	autoprefixer = require('gulp-autoprefixer'),
 	browsersync = require('browser-sync'),
-	del = require('del'),
-	pump = require('pump');
+	del = require('del');
 
 var src = {
 	js: ['src/js/*.js'],
