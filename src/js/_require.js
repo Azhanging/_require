@@ -1,6 +1,7 @@
 /*
- *2016-10-18 16:00:50 
- * fyc构建
+ * 2016-10-18 16:00:50 fyc构建 
+ * 
+ * 2016-11-5 10:21:27 拆分提示,添加path必须为数组类型
  * */
 (function(window) {
 	//模块
@@ -55,13 +56,13 @@
 			//从模块中获取对象
 			var moduleIndex = modules.moduleIdNames.indexOf(id);
 			if(moduleIndex === -1) {
-				console.warn('找不到' + id + '模块!');
+				error(0,id);
 			} else {
 				//返回暴露的接口
 				return new modules.moduleFns[id]();
 			}
 		} else {
-			console.warn('文件引用id必须为字符串!');
+			error(1);
 		}
 	}
 
@@ -79,61 +80,76 @@
 
 					/*--------------------------错误警告--------------------------*/
 				} else {
-					throw('存在相同' + id + '的模块!');
+					error(2,id);
 				}
 			} else {
-				console.warn('传入的第二参数不是函数类型');
+				error(3);
 			}
 		} else {
-			console.warn('模块id必须为字符串!');
+			error(4);
 		}
 	}
 
 	/*开始模块构建初始化引入模块文件*/
 	_require.use = function(callback) {
-			if(_require.config instanceof Object) {
-				var modulePaths = _require.config.path;
-				if(modulePaths instanceof Array) {
-					var len = modulePaths.length,
-						i = 0;
-					//把模块引入到文件中
-					for(; i < len; i++) {
-						var script = document.createElement('script');
-						script.src = modulePaths[i];
-						_$.getEls('head')[0].appendChild(script);
-						//把模块文件索引推送到模块列表,方便获取
-						modules.modulePaths.push(modulePaths[i]);
-						//监听所有的script加载情况
-						isLoadEnd.push(false);
-						//加载模块成功
-						script.onload = (function(i) {
-							return function() {
-								isLoadEnd[i] = true;
-								//判断所有的模块加载是否完毕
-								for(var j = 0, l = isLoadEnd.length; j < l; j++) {
-									if(!isLoadEnd[j]) {
-										return;
-									}
+		if(_require.config instanceof Object) {
+			var modulePaths = _require.config.path;
+			if(modulePaths instanceof Array) {
+				var len = modulePaths.length,
+					i = 0;
+				//把模块引入到文件中
+				for(; i < len; i++) {
+					var script = document.createElement('script');
+					script.src = modulePaths[i];
+					_$.getEls('head')[0].appendChild(script);
+					//把模块文件索引推送到模块列表,方便获取
+					modules.modulePaths.push(modulePaths[i]);
+					//监听所有的script加载情况
+					isLoadEnd.push(false);
+					//加载模块成功
+					script.onload = (function(i) {
+						return function() {
+							isLoadEnd[i] = true;
+							//判断所有的模块加载是否完毕
+							for(var j = 0, l = isLoadEnd.length; j < l; j++) {
+								if(!isLoadEnd[j]) {
+									return;
 								}
-								//所有模块加载完毕后的回调函数
-								callback();
 							}
-						})(i);
-						//加载模块错误
-						script.onerror = (function(i) {
-							return function() {
-								throw(modulePaths[i] + '模块加载有误!');
-							}
-						})(i);
-					}
-				}else{
-					console.warn('_require.config配置路径类型为数组!');
+							//所有模块加载完毕后的回调函数
+							callback();
+						}
+					})(i);
+					//加载模块错误
+					script.onerror = (function(i) {
+						return function() {
+							error(5);
+						}
+					})(i);
 				}
-				/*--------------------------错误警告--------------------------*/
 			} else {
-				console.warn('_require.config配置有误!');
+				error(6);
 			}
+			/*--------------------------错误警告--------------------------*/
+		} else {
+			error(7);
 		}
-		/*当前库暴露*/
+	}
+
+	function error(errorStatus,id) {
+		switch(errorStatus){
+			case 0:console.warn('找不到' + id + '模块!');break;
+			case 1:console.warn('文件引用id必须为字符串!');break;
+			case 2:throw('存在相同' + id + '的模块!');break;
+			case 3:console.warn('传入的第二参数不是函数类型');break;
+			case 4:console.warn('模块id必须为字符串!');break;
+			case 5:throw(modulePaths[i] + '模块加载有误!');break;
+			case 6:console.warn('_require.config配置路径类型为数组!');break;
+			case 7:console.warn('_require.config配置有误!');break;
+			default:;
+		}
+	}
+	/*当前库暴露*/
 	window._require = _require;
+
 })(window);
