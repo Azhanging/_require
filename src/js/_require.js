@@ -5,9 +5,11 @@
  * 
  * 2016-11-16 09:45:01 修改提示错误问题
  * 
- * 
+ * 2016-11-16 20:42:32 修复use无法多次执行,添加模块引入检测,阻止模块的多次引入
  * */
-(function(window) {
+(function(global, factory) {
+	global._require = factory();
+})(typeof window != 'undefined' ? window : this, function() {
 	//模块
 	var _require,
 		//模块列表
@@ -19,7 +21,7 @@
 			//已经引入的模块
 			isLoadmodulePaths: [],
 			//是重复调用use
-			isUse:false,
+			isUse: false,
 			//模块接口函数
 			moduleFns: {}
 		},
@@ -64,7 +66,7 @@
 			//从模块中获取对象
 			var moduleIndex = modules.moduleIdNames.indexOf(id);
 			if(moduleIndex === -1) {
-				error(0,id);
+				error(0, id);
 			} else {
 				//返回暴露的接口
 				return new modules.moduleFns[id]();
@@ -88,7 +90,7 @@
 
 					/*--------------------------错误警告--------------------------*/
 				} else {
-					error(2,id);
+					error(2, id);
 				}
 			} else {
 				error(3);
@@ -108,7 +110,7 @@
 				//把模块引入到文件中
 				for(; i < len; i++) {
 					//判定是否又重复引入的模块
-					if(isLoadModules(modulePaths[i])){
+					if(isLoadModules(modulePaths[i])) {
 						var script = document.createElement('script');
 						script.src = modulePaths[i];
 						_$.getEls('head')[0].appendChild(script);
@@ -139,10 +141,11 @@
 							}
 						})(i);
 					}
-					
+
 				}
-				if(modules.isUse){
+				if(modules.isUse) {
 					callback();
+					modules.isUse = false;
 				}
 			} else {
 				error(6);
@@ -153,32 +156,50 @@
 		}
 	}
 
-	function error(errorStatus,id) {
-		switch(errorStatus){
-			case 0:console.warn('找不到' + id + '模块!');break;
-			case 1:console.warn('文件引用id必须为字符串!');break;
-			case 2:throw('存在相同' + id + '的模块!');break;
-			case 3:console.warn('传入的第二参数不是函数类型');break;
-			case 4:console.warn('模块id必须为字符串!');break;
-			case 5:throw(modules.modulePaths[id] + '模块加载有误!');break;
-			case 6:console.warn('_require.config配置路径类型为数组!');break;
-			case 7:console.warn('_require.config配置有误!');break;
-			default:;
+	function error(errorStatus, id) {
+		switch(errorStatus) {
+			case 0:
+				console.warn('找不到' + id + '模块!');
+				break;
+			case 1:
+				console.warn('文件引用id必须为字符串!');
+				break;
+			case 2:
+				throw('存在相同' + id + '的模块!');
+				break;
+			case 3:
+				console.warn('传入的第二参数不是函数类型');
+				break;
+			case 4:
+				console.warn('模块id必须为字符串!');
+				break;
+			case 5:
+				throw(modules.modulePaths[id] + '模块加载有误!');
+				break;
+			case 6:
+				console.warn('_require.config配置路径类型为数组!');
+				break;
+			case 7:
+				console.warn('_require.config配置有误!');
+				break;
+			default:
+				;
 		}
 	}
-	function isLoadModules(path){
+	/*	 
+	 * 二次调用use时候判断引入的模块是否已经加载过
+	 * 加载过的将不进行再次引入加载,use内的回调还是能继续运行
+	 * */
+	function isLoadModules(path) {
 		var i = 0,
 			len = modules.isLoadmodulePaths.length;
-		for(;i<len;i++){
-			if(modules.isLoadmodulePaths[i] === path){
+		for(; i < len; i++) {
+			if(modules.isLoadmodulePaths[i] === path) {
 				modules.isUse = true;
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	/*当前库暴露*/
-	window._require = _require;
-
-})(window);
+	return _require;
+})
