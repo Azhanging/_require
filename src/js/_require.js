@@ -87,7 +87,6 @@
 					modules.moduleIdNames.push(id);
 					//模块函数推入到临时的数组内,在调用结束后执行
 					modules.moduleFns[id] = fn;
-
 					/*--------------------------错误警告--------------------------*/
 				} else {
 					error(2, id);
@@ -144,8 +143,8 @@
 
 				}
 				if(modules.isUse) {
-					callback();
 					modules.isUse = false;
+					callback();
 				}
 			} else {
 				error(6);
