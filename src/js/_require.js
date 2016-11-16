@@ -2,6 +2,10 @@
  * 2016-10-18 16:00:50 fyc构建 
  * 
  * 2016-11-5 10:21:27 拆分提示,添加path必须为数组类型
+ * 
+ * 2016-11-16 09:45:01 修改提示错误问题
+ * 
+ * 
  * */
 (function(window) {
 	//模块
@@ -12,6 +16,10 @@
 			modulePaths: [],
 			//模块id名
 			moduleIdNames: [],
+			//已经引入的模块
+			isLoadmodulePaths: [],
+			//是重复调用use
+			isUse:false,
 			//模块接口函数
 			moduleFns: {}
 		},
@@ -99,33 +107,42 @@
 					i = 0;
 				//把模块引入到文件中
 				for(; i < len; i++) {
-					var script = document.createElement('script');
-					script.src = modulePaths[i];
-					_$.getEls('head')[0].appendChild(script);
-					//把模块文件索引推送到模块列表,方便获取
-					modules.modulePaths.push(modulePaths[i]);
-					//监听所有的script加载情况
-					isLoadEnd.push(false);
-					//加载模块成功
-					script.onload = (function(i) {
-						return function() {
-							isLoadEnd[i] = true;
-							//判断所有的模块加载是否完毕
-							for(var j = 0, l = isLoadEnd.length; j < l; j++) {
-								if(!isLoadEnd[j]) {
-									return;
+					//判定是否又重复引入的模块
+					if(isLoadModules(modulePaths[i])){
+						var script = document.createElement('script');
+						script.src = modulePaths[i];
+						_$.getEls('head')[0].appendChild(script);
+						//把模块文件索引推送到模块列表,方便获取
+						modules.modulePaths.push(modulePaths[i]);
+						//已加载的模块
+						modules.isLoadmodulePaths.push(modulePaths[i]);
+						//监听所有的script加载情况
+						isLoadEnd.push(false);
+						//加载模块成功
+						script.onload = (function(i) {
+							return function() {
+								isLoadEnd[i] = true;
+								//判断所有的模块加载是否完毕
+								for(var j = 0, l = isLoadEnd.length; j < l; j++) {
+									if(!isLoadEnd[j]) {
+										return;
+									}
 								}
+								//所有模块加载完毕后的回调函数
+								callback();
 							}
-							//所有模块加载完毕后的回调函数
-							callback();
-						}
-					})(i);
-					//加载模块错误
-					script.onerror = (function(i) {
-						return function() {
-							error(5);
-						}
-					})(i);
+						})(i);
+						//加载模块错误
+						script.onerror = (function(i) {
+							return function() {
+								error(5);
+							}
+						})(i);
+					}
+					
+				}
+				if(modules.isUse){
+					callback();
 				}
 			} else {
 				error(6);
@@ -143,12 +160,24 @@
 			case 2:throw('存在相同' + id + '的模块!');break;
 			case 3:console.warn('传入的第二参数不是函数类型');break;
 			case 4:console.warn('模块id必须为字符串!');break;
-			case 5:throw(modulePaths[i] + '模块加载有误!');break;
+			case 5:throw(modules.modulePaths[id] + '模块加载有误!');break;
 			case 6:console.warn('_require.config配置路径类型为数组!');break;
 			case 7:console.warn('_require.config配置有误!');break;
 			default:;
 		}
 	}
+	function isLoadModules(path){
+		var i = 0,
+			len = modules.isLoadmodulePaths.length;
+		for(;i<len;i++){
+			if(modules.isLoadmodulePaths[i] === path){
+				modules.isUse = true;
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	/*当前库暴露*/
 	window._require = _require;
 
