@@ -5,11 +5,11 @@
  * 
  * 2016-11-16 09:45:01 修改提示错误问题
  * 
- * 2016-11-16 20:42:32 修复use无法多次执行,添加模块引入检测,阻止模块的多次引入
+ * 
  * */
 (function(global, factory) {
-	global._require = factory();
-})(typeof window != 'undefined' ? window : this, function() {
+	global._require = factory(); 
+})(typeof window !== 'undefined' ? window : this, function() {
 	//模块
 	var _require,
 		//模块列表
@@ -32,27 +32,15 @@
 
 	_$ = (function() {
 		var getEls = (function() {
-			if(typeof document.querySelectorAll === 'function') {
-				return function(el) {
-					return document.querySelectorAll(el)
-				};
-			} else {
-				return function(el) {
-					return document.getElementsByTagName(el)
-				};
-			}
+			return function(el) {
+				return document.getElementsByTagName(el)
+			};
 		})();
 
 		var getEl = (function() {
-			if(typeof document.querySelector === 'function') {
-				return function(el) {
-					return document.querySelector(el)
-				};
-			} else {
-				return function(el) {
-					return document.getElementById(el)
-				};
-			}
+			return function(el) {
+				return document.getElementById(el)
+			};
 		})();
 		return {
 			getEls: getEls,
@@ -87,6 +75,7 @@
 					modules.moduleIdNames.push(id);
 					//模块函数推入到临时的数组内,在调用结束后执行
 					modules.moduleFns[id] = fn;
+
 					/*--------------------------错误警告--------------------------*/
 				} else {
 					error(2, id);
@@ -143,7 +132,6 @@
 
 				}
 				if(modules.isUse) {
-					modules.isUse = false;
 					callback();
 				}
 			} else {
@@ -185,10 +173,7 @@
 				;
 		}
 	}
-	/*	 
-	 * 二次调用use时候判断引入的模块是否已经加载过
-	 * 加载过的将不进行再次引入加载,use内的回调还是能继续运行
-	 * */
+
 	function isLoadModules(path) {
 		var i = 0,
 			len = modules.isLoadmodulePaths.length;
@@ -201,4 +186,4 @@
 		return true;
 	}
 	return _require;
-})
+});
