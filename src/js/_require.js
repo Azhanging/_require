@@ -5,15 +5,13 @@
  * 
  * 2016-11-16 09:45:01 修改提示错误问题
  * 
- * 
+ * 2016-12-11 09:50:44 修复提示错
  * */
 (function(global, factory) {
 	global._require = factory(); 
 })(typeof window !== 'undefined' ? window : this, function() {
-	//模块
-	var _require,
 		//模块列表
-		modules = {
+	var	modules = {
 			//模块路径
 			modulePaths: [],
 			//模块id名
@@ -49,7 +47,7 @@
 	})(_$);
 
 	/*引入模块文件*/
-	_require = function(id) {
+	function _require(id) {
 		if(typeof id === 'string') {
 			//从模块中获取对象
 			var moduleIndex = modules.moduleIdNames.indexOf(id);
@@ -125,7 +123,7 @@
 						//加载模块错误
 						script.onerror = (function(i) {
 							return function() {
-								error(5);
+								error(5,i);
 							}
 						})(i);
 					}
