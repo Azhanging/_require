@@ -190,5 +190,8 @@
 		}
 		return true;
 	}
+	
+	_require.version = '1.0.5';
+	
 	return _require;
 });
