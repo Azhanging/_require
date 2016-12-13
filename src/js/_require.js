@@ -8,7 +8,14 @@
  * 2016-12-11 09:50:44 修复提示错
  * */
 (function(global, factory) {
-	global._require = factory(); 
+	global._require = factory();
+	//共享变量
+	Object.defineProperty(global,'G',{
+		value:{},
+		enumerable: true,
+		configurable: false,
+		writable:false
+	});
 })(typeof window !== 'undefined' ? window : this, function() {
 		//模块列表
 	var	modules = {
