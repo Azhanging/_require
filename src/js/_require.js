@@ -8,15 +8,8 @@
  * 2016-12-11 09:50:44 修复提示错
  * */
 (function(global, factory) {
-	global._require = factory();
-	//共享变量
-	Object.defineProperty(global,'G',{
-		value:{},
-		enumerable: true,
-		configurable: false,
-		writable:false
-	});
-})(typeof window !== 'undefined' ? window : this, function() {
+	global._require = factory(global);
+})(typeof window !== 'undefined' ? window : this, function(global) {
 		//模块列表
 	var	modules = {
 			//模块路径
@@ -34,6 +27,15 @@
 		isLoadEnd = [],
 		//获取对象
 		_$;
+	
+	//共享变量
+	Object.defineProperty(global,'G',{
+		value:{},
+		enumerable: true,
+		configurable: false,
+		writable:false
+	});
+
 
 	_$ = (function() {
 		var getEls = (function() {
@@ -179,6 +181,7 @@
 		}
 	}
 
+	//判定是否多次使用use，以及多次引入相同的模块
 	function isLoadModules(path) {
 		var i = 0,
 			len = modules.isLoadmodulePaths.length;
