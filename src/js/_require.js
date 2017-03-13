@@ -21,23 +21,14 @@
 			//是重复调用use
 			isUse: false,
 			//模块接口函数
-			moduleFns: {}
+			moduleFns: {},
+			//模块注释
+			modulesComment:{}
 		},
 		//判断模块是否加载
-		isLoadEnd = [],
-		//获取对象
-		_$;
-	
-	//共享变量
-	Object.defineProperty(global,'G',{
-		value:{},
-		enumerable: true,
-		configurable: false,
-		writable:false
-	});
+		isLoadEnd = [];
 
-
-	_$ = (function() {
+	var _$ = (function() {
 		var getEls = (function() {
 			return function(el) {
 				return document.getElementsByTagName(el)
@@ -53,7 +44,38 @@
 			getEls: getEls,
 			getEl: getEl
 		}
-	})(_$);
+	})();
+	
+	function setComment(id,comment){
+		if(comment && typeof comment == 'string'){
+			modules.modulesComment[id] = comment;
+		}
+	}
+	
+	//兼容性IE8
+	(function compatibility(){
+		//不兼容IE8代理数据
+		if(navigator.userAgent.indexOf('MSIE 8.0') == -1){
+			//共享变量
+			Object.defineProperty(global,'G',{
+				value:{},
+				enumerable: true,
+				configurable: false,
+				writable:false
+			});
+		}
+		//兼容IE8中 的indexOf
+		if(!Array.prototype.indexOf) {
+			Array.prototype.indexOf = function(val) {
+				for(var index = 0, len = this.length; index < len; index++) {
+					if(this[index] === val) {
+						return index;
+					}
+				}
+				return -1;
+			}
+		}
+	})();
 
 	/*引入模块文件*/
 	function _require(id) {
@@ -61,18 +83,18 @@
 			//从模块中获取对象
 			var moduleIndex = modules.moduleIdNames.indexOf(id);
 			if(moduleIndex === -1) {
-				error(0, id);
+				_require.error(0, id);
 			} else {
 				//返回暴露的接口
 				return new modules.moduleFns[id]();
 			}
 		} else {
-			error(1);
+			_require.error(1);
 		}
 	}
 
 	/*模块构建*/
-	_require.define = function(id, fn) {
+	_require.define = function(id, fn,comment) {
 		//id不能为数字
 		if(typeof id === 'string') {
 			if(typeof fn === 'function') {
@@ -82,16 +104,17 @@
 					modules.moduleIdNames.push(id);
 					//模块函数推入到临时的数组内,在调用结束后执行
 					modules.moduleFns[id] = fn;
-
+					//存在注释的话添加注释到的模块列表中
+					setComment(id,comment);
 					/*--------------------------错误警告--------------------------*/
 				} else {
-					error(2, id);
+					_require.error(2, id);
 				}
 			} else {
-				error(3);
+				_require.error(3);
 			}
 		} else {
-			error(4);
+			_require.error(4);
 		}
 	}
 
@@ -120,10 +143,8 @@
 							return function() {
 								isLoadEnd[i] = true;
 								//判断所有的模块加载是否完毕
-								for(var j = 0, l = isLoadEnd.length; j < l; j++) {
-									if(!isLoadEnd[j]) {
-										return;
-									}
+								if(isLoadEnd.indexOf(false) != -1) {
+									return;
 								}
 								//所有模块加载完毕后的回调函数
 								callback();
@@ -132,7 +153,7 @@
 						//加载模块错误
 						script.onerror = (function(i) {
 							return function() {
-								error(5,i);
+								_require.error(5,i);
 							}
 						})(i);
 					}
@@ -142,15 +163,15 @@
 					callback();
 				}
 			} else {
-				error(6);
+				_require.error(6);
 			}
 			/*--------------------------错误警告--------------------------*/
 		} else {
-			error(7);
+			_require.error(7);
 		}
 	}
 
-	function error(errorStatus, id) {
+	_require.error = function(errorStatus, id) {
 		switch(errorStatus) {
 			case 0:
 				console.warn('找不到' + id + '模块!');
@@ -180,6 +201,11 @@
 				;
 		}
 	}
+	
+	//模块列表
+	_require.modulesList = modules.moduleIdNames;
+	//模块注释信息查询
+	_require.modulesComment = modules.modulesComment;
 
 	//判定是否多次使用use，以及多次引入相同的模块
 	function isLoadModules(path) {
@@ -194,7 +220,7 @@
 		return true;
 	}
 	
-	_require.version = '1.0.5';
+	_require.version = '1.0.6';
 	
 	return _require;
 });

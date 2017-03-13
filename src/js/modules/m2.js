@@ -4,4 +4,4 @@ _require.define('m2',function(){
 	return {
 		b:b
 	}
-});
+},"测试模块的注释内容2");

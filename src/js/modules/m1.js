@@ -16,5 +16,5 @@ _require.define('m1',function(){
 		c:changeB,
 		bb:bb
 	}
-});
+},"测试模块的注释内容1");
 
