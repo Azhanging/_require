@@ -49,6 +49,8 @@
 	function setComment(id,comment){
 		if(comment && typeof comment == 'string'){
 			modules.modulesComment[id] = comment;
+		}else{
+			modules.modulesComment[id] = '该模块没有设置注释';
 		}
 	}
 	
