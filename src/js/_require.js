@@ -23,7 +23,9 @@
 			//模块接口函数
 			moduleFns: {},
 			//模块注释
-			modulesComment:{}
+			modulesComment:{},
+			//useList待处理的队列
+			useList:[]
 		},
 		//判断模块是否加载
 		isLoadEnd = [];
@@ -83,8 +85,7 @@
 	function _require(id) {
 		if(typeof id === 'string') {
 			//从模块中获取对象
-			var moduleIndex = modules.moduleIdNames.indexOf(id);
-			if(moduleIndex === -1) {
+			if(modules.moduleIdNames.indexOf(id) === -1) {
 				_require.error(0, id);
 			} else {
 				//返回暴露的接口
@@ -122,13 +123,16 @@
 
 	/*开始模块构建初始化引入模块文件*/
 	_require.use = function(callback) {
+		//查看是否存在配置文件
 		if(_require.config instanceof Object) {
+			//取出配置文件的模块路径
 			var modulePaths = _require.config.path;
+			//模块路径为一个数组
 			if(modulePaths instanceof Array) {
-				var len = modulePaths.length,
-					i = 0;
+				//use列表
+				modules.useList.push(callback);
 				//把模块引入到文件中
-				for(; i < len; i++) {
+				for(var i = 0,len = modulePaths.length; i < len; i++) {
 					//判定是否又重复引入的模块
 					if(isLoadModules(modulePaths[i])) {
 						var script = document.createElement('script');
@@ -136,7 +140,7 @@
 						_$.getEls('head')[0].appendChild(script);
 						//把模块文件索引推送到模块列表,方便获取
 						modules.modulePaths.push(modulePaths[i]);
-						//已加载的模块
+						//已加载的模块路径
 						modules.isLoadmodulePaths.push(modulePaths[i]);
 						//监听所有的script加载情况
 						isLoadEnd.push(false);
@@ -149,7 +153,9 @@
 									return;
 								}
 								//所有模块加载完毕后的回调函数
-								callback();
+								for(var j = 0,len = modules.useList.length; j<len;j++){
+									modules.useList.shift()();
+								}
 							}
 						})(i);
 						//加载模块错误
@@ -159,10 +165,12 @@
 							}
 						})(i);
 					}
-
 				}
-				if(modules.isUse) {
-					callback();
+				//如果当前的use为后面加入的，进入队列中
+				if(isLoadEnd.indexOf(false) != -1) {
+					return;
+				}else{
+					modules.useList.shift()();
 				}
 			} else {
 				_require.error(6);
@@ -211,15 +219,11 @@
 
 	//判定是否多次使用use，以及多次引入相同的模块
 	function isLoadModules(path) {
-		var i = 0,
-			len = modules.isLoadmodulePaths.length;
-		for(; i < len; i++) {
-			if(modules.isLoadmodulePaths[i] === path) {
-				modules.isUse = true;
-				return false;
-			}
+		if(modules.isLoadmodulePaths.indexOf(path) != -1){
+			return false;
+		}else{
+			return true;
 		}
-		return true;
 	}
 	
 	_require.version = '1.0.6';

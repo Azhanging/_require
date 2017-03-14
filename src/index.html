@@ -13,7 +13,33 @@
 			_require.config = {
 				path: [
 					//使用gulp压缩混淆模块,只请求http一次
-//					'js/modules/modules.js'
+					//					'js/modules/modules.js'
+					//未使用前的拆分模块(调试)
+					'js/modules/m1.js',
+					'js/modules/m2.js',
+					'js/modules/m3.js'
+				]
+			}
+			_require.use(function() {
+				var _1 = _require('m1');
+				var _11 = _require('m1');
+				var _2 = _require('m2');
+
+				console.log(_1);
+				_1.c(123456789);
+				console.log(_1.bb());
+
+				console.log(_11);
+				_11.c(1456432132);
+				console.log(_11.bb());
+
+				console.log(_1.bb());
+			});
+
+			_require.config = {
+				path: [
+					//使用gulp压缩混淆模块,只请求http一次
+					//					'js/modules/modules.js'
 					//未使用前的拆分模块(调试)
 					'js/modules/m1.js',
 					'js/modules/m2.js',
@@ -28,13 +54,13 @@
 				console.log(_1);
 				_1.c(12);
 				console.log(_1.bb());
-				
+
 				console.log(_11);
-				_11.c(1456432132);
+				_11.c(12);
 				console.log(_11.bb());
-				
+
 				console.log(_1.bb());
-			});	
+			});
 		</script>
 		<!--<script type="text/javascript">
 			var c = (function() {
