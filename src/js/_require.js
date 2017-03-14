@@ -124,7 +124,7 @@
 	/*开始模块构建初始化引入模块文件*/
 	_require.use = function(callback) {
 		//查看是否存在配置文件
-		if(_require.config instanceof Object) {
+		if(_require.config instanceof Object && typeof callback == 'function') {
 			//取出配置文件的模块路径
 			var modulePaths = _require.config.path;
 			//模块路径为一个数组
@@ -205,7 +205,7 @@
 				console.warn('_require.config配置路径类型为数组!');
 				break;
 			case 7:
-				console.warn('_require.config配置有误!');
+				console.warn('_require参数配置有误!');
 				break;
 			default:
 				;
