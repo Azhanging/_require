@@ -161,7 +161,7 @@
 						//加载模块错误
 						script.onerror = (function(path) {
 							return function() {
-								_require.error(5,i);
+								_require.error(5,path);
 							}
 						})(modulePaths[i]);
 					}
@@ -200,7 +200,7 @@
 				console.warn('模块id必须为字符串!');
 				break;
 			case 5:
-				throw(modules.modulePaths[id] + '模块加载有误!');
+				throw(modules.modulePathFile[id].path + '模块加载有误!');
 				break;
 			case 6:
 				console.warn('_require.config配置路径类型为数组!');
