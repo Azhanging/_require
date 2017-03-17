@@ -13,11 +13,13 @@
 		//模块列表
 	var	modules = {
 			//模块路径
-			modulePathFile: {},
+			modulePaths: [],
 			//模块id名
 			moduleIdNames: [],
 			//已经引入的模块
 			isLoadmodulePaths: [],
+			//是重复调用use
+			isUse: false,
 			//模块接口函数
 			moduleFns: {},
 			//模块注释
@@ -136,20 +138,18 @@
 						var script = document.createElement('script');
 						script.src = modulePaths[i];
 						_$.getEls('head')[0].appendChild(script);
-						
 						//把模块文件索引推送到模块列表,方便获取
-						modules.modulePathFile[modulePaths[i]] = {
-							isLoad:false,
-							path:modulePaths[i]
-						};
+						modules.modulePaths.push(modulePaths[i]);
 						//已加载的模块路径
 						modules.isLoadmodulePaths.push(modulePaths[i]);
+						//监听所有的script加载情况
+						isLoadEnd.push(false);
 						//加载模块成功
-						script.onload = (function(path) {
+						script.onload = (function(i) {
 							return function() {
-								modules.modulePathFile[path].isLoad = true;
+								isLoadEnd[i] = true;
 								//判断所有的模块加载是否完毕
-								if(!checkIsLoad()){
+								if(isLoadEnd.indexOf(false) != -1) {
 									return;
 								}
 								//所有模块加载完毕后的回调函数
@@ -157,18 +157,17 @@
 									modules.useList.shift()();
 								}
 							}
-						})(modulePaths[i]);
+						})(i);
 						//加载模块错误
-						script.onerror = (function(path) {
+						script.onerror = (function(i) {
 							return function() {
 								_require.error(5,i);
 							}
-						})(modulePaths[i]);
+						})(i);
 					}
 				}
 				//如果当前的use为后面加入的，进入队列中
-				//判断所有的模块加载是否完毕
-				if(!checkIsLoad()){
+				if(isLoadEnd.indexOf(false) != -1) {
 					return;
 				}else{
 					modules.useList.shift()();
@@ -227,19 +226,7 @@
 		}
 	}
 	
-	//判断是否加载模块完毕
-	function checkIsLoad(){
-		for(var path in modules.modulePathFile){
-			if(modules.modulePathFile.hasOwnProperty(path)){
-				if(modules.modulePathFile[path].isLoad == false){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-	
-	_require.version = '1.0.7';
+	_require.version = '1.0.6';
 	
 	return _require;
 });
