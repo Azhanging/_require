@@ -8,7 +8,10 @@
  * 2016-12-11 09:50:44 修复提示错
  * */
 (function(global, factory) {
-	global._require = factory(global);
+	//不引入两次
+	if(!(typeof global._require == 'function')){
+		global._require = factory(global);
+	}
 })(typeof window !== 'undefined' ? window : this, function(global) {
 		//模块列表
 	var	modules = {
