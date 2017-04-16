@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<script src="js/__require.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			_require.config({
+				paths:[
+					'./js/modules/m1.js'
+				]
+			});
+			
+			_require.use(function(){
+				console.log('a');
+			});
+			
+			_require.use(function(){
+				console.log('a');
+			});
+			
+			_require.config({
+				paths:[
+					'./js/modules/m1.js',
+					'./js/modules/m3.js',
+					'./js/modules/m2/m2.js'
+				]
+			});
+			
+			
+			_require.use(function(){
+				var a = _require('m1');
+				var b = _require('m2');
+				var c = _require('m3');
+				console.log(a);
+			});
+		</script>
+	</body>
+</html>

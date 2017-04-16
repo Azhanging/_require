@@ -1,7 +1,7 @@
-_require.define('m3',function(){
+_require.define(function(){
 	var _m2 = _require('m2');
 	var b = _m2.b;
 	return {
 		b:b
 	}
-},"测试模块的注释内容3");   
+});   
