@@ -8,8 +8,9 @@
 		<script src="js/__require.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			_require.config({
+				baseUrl:'http://192.168.199.141:8079/_require/src',
 				paths:[
-					'./js/modules/m1.js'
+					'/js/modules/m1.js'
 				]
 			});
 			
@@ -22,19 +23,20 @@
 			});
 			
 			_require.config({
+				baseUrl:'http://192.168.199.141:8079/_require/src',
 				paths:[
-					'./js/modules/m1.js',
-					'./js/modules/m3.js',
-					'./js/modules/m2/m2.js'
+					'/js/modules/m1.js',
+					'/js/modules/m3.js',
+					'/js/modules/m2/m2.js'
 				]
 			});
 			
 			
 			_require.use(function(){
-				var a = _require('m1');
-				var b = _require('m2');
+				var a = _require('/js/modules/m1.js');
+				var b = _require('/js/modules/m2/m2.js');
 				var c = _require('m3');
-				console.log(a);
+				console.log(a.c);
 			});
 		</script>
 	</body>
