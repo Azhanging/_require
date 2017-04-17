@@ -4,16 +4,21 @@
 		global._require = factory(global);
 	}
 })(typeof window !== 'undefined' ? window : this, function(global) {
+	
+	//http、https链接
+	var HTTP_PATH = /^http(s)?:\/\//;
+	//相对路径
+	var RELATIVE_PATH = /^\./;
+	//别名路径
+	var ALIAS_PATH = /^\@/;
 
 	//获取模块
 	function _require(path) {
-		var getModules = _require.modules.installedModules[_require.baseUrl + path];
+		var getModules = _require.modules.installedModules[setUrl([path])[0]];
 		if(!getModules){
 		//获取的可能是id
 			getModules = _require.modules.installedModules[path];
-		}
-		
-		if(getModules) {
+		}else if(getModules) {
 			return getModules.path();
 		} else {
 			_require.error(1, path);
@@ -41,6 +46,7 @@
 	//设置配置信息,并且初始化
 	_require.config = function(options) {
 		_require.baseUrl = options.baseUrl;
+		_require.alias = options.alias;
 		//加载模块
 		loadModules(setUrl(options.paths));
 	}
@@ -87,8 +93,23 @@
 	//设置路径
 	function setUrl(paths) {
 		var _paths = [];
+		var newPath = '';
 		for(var index = 0; index < paths.length; index++) {
-			_paths.push(_require.baseUrl+paths[index]);
+			//http链接
+			if(HTTP_PATH.test(paths[index])){
+				_paths.push(paths[index]);
+			}else if(RELATIVE_PATH.test(paths[index])){ //相对路径
+				newPath = paths[index].replace(/^\./,'');
+				_paths.push(_require.baseUrl+newPath);
+			}else if(ALIAS_PATH.test(paths[index])){	//别名路径
+				var aliasPath = paths[index].match(/\@(\S).*?\//)[0].replace(/\/?/g,'');
+				
+				var replaceSeize = aliasPath.replace(/\@/,'');
+				
+				var replaceAliasPath = paths[index].replace(aliasPath,_require.alias[replaceSeize]);
+				
+				_paths.push(replaceAliasPath);
+			}
 		}
 		return _paths;
 	}
@@ -183,6 +204,7 @@
 			case 3:
 				console.warn(msg + '模块参数有误');
 				break;
+			default:;
 		}
 	}
 
