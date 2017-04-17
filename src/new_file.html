@@ -7,29 +7,16 @@
 	<body>
 		<script src="js/__require.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
-			_require.config({
-				baseUrl:location.origin + '/_require/src',
-				paths:[
-					'./js/modules/m1.js'
-				]
-			});
-			
-			_require.use(function(){
-				console.log('a');
-			});
-			
-			_require.use(function(){
-				console.log('a');
-			});
 			
 			_require.config({
 				baseUrl:location.origin,
 				alias:{
-					'js':'/_require/src'
+					'js':'/_require/src/js',
+					'js1':'/_require/src'
 				},
 				paths:[
-					'@js/js/modules/m1.js',
-					'@js/js/modules/m3.js',
+					'@js/modules/m1.js',
+					'@js1/js/modules/m3.js',
 					'./_require/src/js/modules/m2/m2.js',
 					'http://libs.baidu.com/jquery/2.0.0/jquery.min.js'
 				]
@@ -37,10 +24,10 @@
 			
 			
 			_require.use(function(){
-				var a = _require('/js/modules/m1.js');
+				var a = _require('@js/modules/m1.js');
 				var b = _require('./_require/src/js/modules/m2/m2.js');
 				var c = _require('m3');
-				console.log(a.c);
+				console.log(a.a());
 			});
 		</script>
 	</body>

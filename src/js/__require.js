@@ -10,14 +10,39 @@
 	//相对路径
 	var RELATIVE_PATH = /^\./;
 	//别名路径
-	var ALIAS_PATH = /^\@/;
+	var ALIAS_PATH = /^@[^\/]*/;
+	
+	//兼容性IE8
+	(function compatibility(){
+		//不兼容IE8代理数据
+		if(navigator.userAgent.indexOf('MSIE 8.0') == -1){
+			//共享变量
+			Object.defineProperty(global,'G',{
+				value:{},
+				enumerable: true,
+				configurable: false,
+				writable:false
+			});
+		}
+		//兼容IE8中 的indexOf
+		if(!Array.prototype.indexOf) {
+			Array.prototype.indexOf = function(val) {
+				for(var index = 0, len = this.length; index < len; index++) {
+					if(this[index] === val) {
+						return index;
+					}
+				}
+				return -1;
+			}
+		}
+	})();
 
 	//获取模块
 	function _require(path) {
-		var getModules = _require.modules.installedModules[setUrl([path])[0]];
+		var getModules = _require.modules.installedModules[getUrl(path)];
 		if(!getModules){
 		//获取的可能是id
-			getModules = _require.modules.installedModules[path];
+			return new _require.modules.installedModules[path].path();
 		}else if(getModules) {
 			return getModules.path();
 		} else {
@@ -93,25 +118,25 @@
 	//设置路径
 	function setUrl(paths) {
 		var _paths = [];
-		var newPath = '';
 		for(var index = 0; index < paths.length; index++) {
-			//http链接
-			if(HTTP_PATH.test(paths[index])){
-				_paths.push(paths[index]);
-			}else if(RELATIVE_PATH.test(paths[index])){ //相对路径
-				newPath = paths[index].replace(/^\./,'');
-				_paths.push(_require.baseUrl+newPath);
-			}else if(ALIAS_PATH.test(paths[index])){	//别名路径
-				var aliasPath = paths[index].match(/\@(\S).*?\//)[0].replace(/\/?/g,'');
-				
-				var replaceSeize = aliasPath.replace(/\@/,'');
-				
-				var replaceAliasPath = paths[index].replace(aliasPath,_require.alias[replaceSeize]);
-				
-				_paths.push(replaceAliasPath);
-			}
+			_paths.push(getUrl(paths[index]));
 		}
 		return _paths;
+	}
+	
+	function getUrl(path){
+		//http链接
+		if(HTTP_PATH.test(path)){
+			return path;
+		}else if(RELATIVE_PATH.test(path)){ 
+		//相对路径
+			return _require.baseUrl + path.replace(/^\./,'');
+		}else if(ALIAS_PATH.test(path)){	
+		//别名路径
+			var replaceString = path.match(ALIAS_PATH)[0];
+			var aliasKey = replaceString.replace('\@',''); 
+			return _require.baseUrl + path.replace(replaceString,_require.alias[aliasKey]);
+		}
 	}
 
 	//加载模块
@@ -150,8 +175,8 @@
 						modules.installedModules[modules.lastLoadId].dep = modules.lastDepModules;
 						//初始化id的选项
 						modules.lastLoadId = null;
-						modules.lastDepModules = [];
 					}
+					modules.lastDepModules = [];
 					//检查当前模块是全部否完成
 					if(isLoad()) {
 						runUse();
