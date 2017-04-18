@@ -70,7 +70,7 @@
 
 	//设置配置信息,并且初始化
 	_require.config = function(options) {
-		_require.baseUrl = options.baseUrl;
+		_require.baseUrl = options.baseUrl?options.baseUrl:"";
 		_require.alias = options.alias;
 		//加载模块
 		loadModules(setUrl(options.paths));

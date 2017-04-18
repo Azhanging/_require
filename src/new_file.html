@@ -9,7 +9,7 @@
 		<script type="text/javascript">
 			
 			_require.config({
-				baseUrl:location.origin,
+//				baseUrl:location.origin,
 				alias:{
 					'js':'/_require/src/js',
 					'js1':'/_require/src'
@@ -28,6 +28,20 @@
 				var b = _require('./_require/src/js/modules/m2/m2.js');
 				var c = _require('m3');
 				console.log(a.a());
+			});
+			
+			_require.config({
+				baseUrl:location.origin,
+				alias:{
+					'js':'/_require/src/js',
+					'js1':'/_require/src'
+				},
+				paths:[
+					'@js/modules/m1.js',
+					'@js1/js/modules/m3.js',
+					'./_require/src/js/modules/m2/m2.js',
+					'http://libs.baidu.com/jquery/2.0.0/jquery.min.js'
+				]
 			});
 		</script>
 	</body>
