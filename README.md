@@ -1,29 +1,23 @@
 # _require
 小型模块构建器
 
-### _require(moduleId):
-
-	moduleId:string类型,获取moduleId对应的模块;
-
-***
-### _require.define(id,fn,comment):
+### _require.define([id,[dep],]handler):
+	id:{type:String} 模块的id，可选使用。
 	
-	id为字符串类型,通过_require(id)可以获取到暴露的接口;
-	fn为模块的执行函数,内部定义暴露的接口;
-	comment为模块的注释内容
-***
-### _require.config = {}
-	path(数组类型):引入模块的路径
+	dep:{type:Array} 依赖的模块，可选使用，可以是路径模块（未加载的会请求加载回来），也可以是id模块；
 	
+	handler{type:Function} 处理函数,如果存在依赖模块的定义，参数为返回的依赖模块；
+***
+### _require.config(options)
+	baseUrl:{type:String} 模块加载的根路径
+	alias:{type:Object} 路径别名,设置paths路径可以以别名开头
+	paths:{type:Array} 设置模块的路径
+		-- 相对路径:路径以/开头，在设置baseUrl的情况下为 baseUrl + 绝对路径 否则为 相对路径；
+		-- 别名路径:paths中获取alias的路径需要使用@开头加上alias的key值可以获取别名值，在设置baseUrl的情况下为 baseUrl + 别名路径 + 设置时别名后的路径；
+		-- http || https:直接载入http和https的模块；
+		
 ### _require.use(callback);
 	加载模块，所有的模块加载完毕后，执行回调函数；
-	
-### _require.modulesList
-	可以查看所有的模块列表
-	
-### _require.modulesComment[modulesName]
-	modulesName：模块的名称
-	可以查看所输模块名的模块注释
 	
 ### G变量代理（不支持IE8）
 	例如：G['id'] = 1;

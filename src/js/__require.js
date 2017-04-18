@@ -7,13 +7,13 @@
 	
 	//http、https链接
 	var HTTP_PATH = /^http(s)?:\/\//;
-	//相对路径
-	var RELATIVE_PATH = /^\./;
+	//绝对路径
+	var ABSOLUTE_PATH = /^\//;
 	//别名路径
 	var ALIAS_PATH = /^@[^\/]*/;
 	
 	//兼容性IE8
-	(function compatibility(){
+	(function(){
 		//不兼容IE8代理数据
 		if(navigator.userAgent.indexOf('MSIE 8.0') == -1){
 			//共享变量
@@ -42,9 +42,17 @@
 		var getModules = _require.modules.installedModules[getUrl(path)];
 		if(!getModules){
 		//获取的可能是id
-			return new _require.modules.installedModules[path].path();
+			try{				
+				return new _require.modules.installedModules[path].path();
+			}catch(e){
+				_require.error(1,path);
+			}
 		}else if(getModules) {
-			return getModules.path();
+			try{
+				return new getModules.path();
+			}catch(e){
+				_require.error(1,path);
+			}
 		} else {
 			_require.error(1, path);
 		}
@@ -77,7 +85,7 @@
 	}
 
 	//定义模块
-	_require.define = function(id, callback) {
+	_require.define = function() {
 		var modules = _require.modules;
 		var hasLastModuleHandler = false;
 		var arg_0 = arguments[0],
@@ -88,10 +96,16 @@
 		if(typeof arg_0 === 'string') {
 			//如果第二个参数是依赖，先设置依赖
 			if(arg_1 instanceof Array) {
-				loadModules(arg_1);
+				depHandler(arg_1);
 				modules.lastLoadId = arg_0;
-				modules.lastLoadModuleHandler = arg_2;
 				modules.lastDepModules = arg_1;
+				modules.lastLoadModuleHandler = function(){
+					//设置依赖模块
+					var deps = arg_1.map(function(moduleName){
+						return _require(moduleName);
+					});
+					return arg_2.apply(this,deps);	
+				};
 			} else if(typeof arg_1 === 'function') {
 				//如果第二个参数是模块函数
 				modules.lastLoadId = arg_0;
@@ -100,9 +114,15 @@
 		} else {
 			//非id模块
 			if(arg_0 instanceof Array) {
-				loadModules(arg_0);
-				modules.lastLoadModuleHandler = arg_1;
+				depHandler(arg_0);
 				modules.lastDepModules = arg_0;
+				modules.lastLoadModuleHandler = function(){
+					//设置依赖模块
+					var deps = arg_0.map(function(moduleName){
+						return _require(moduleName);
+					});
+					return arg_1.apply(this,deps);	
+				};
 			} else if(typeof arg_0 === 'function') {
 				//如果第二个参数是模块函数
 				modules.lastLoadModuleHandler = arg_0;
@@ -124,14 +144,22 @@
 		return _paths;
 	}
 	
+	//处理dep是否存在已加载的模块
+	function depHandler(paths){
+		var newPaths = paths.filter(function(path){
+			return !hasModule(path) && !isIdModule(path);
+		});
+		loadModules(setUrl(newPaths));
+	}
+	
 	function getUrl(path){
 		//http链接
 		if(HTTP_PATH.test(path)){
 			return path;
-		}else if(RELATIVE_PATH.test(path)){ 
-		//相对路径
-			return _require.baseUrl + path.replace(/^\./,'');
-		}else if(ALIAS_PATH.test(path)){	
+		}else if(ABSOLUTE_PATH.test(path)){
+		//绝对路径
+			return _require.baseUrl + path;
+		}else if(ALIAS_PATH.test(path)){
 		//别名路径
 			var replaceString = path.match(ALIAS_PATH)[0];
 			var aliasKey = replaceString.replace('\@',''); 
@@ -192,6 +220,14 @@
 	//检测是否存在了模块
 	function hasModule(path) {
 		if(_require.modules.modulesLists.indexOf(path) === -1) {
+			return false;
+		}
+		return true;
+	}
+	
+	//检测是否为id模块
+	function isIdModule(path){
+		if(/\.js/.test(path)){
 			return false;
 		}
 		return true;

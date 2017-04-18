@@ -1,20 +1,9 @@
-_require.define(function(){
-	var b = 1;
-	function a(el,text){
-		var _m2 = _require('@js/modules/m2/m2.js');
-		return _m2.b;
+_require.define(['@js/modules/m2/m2.js','m2'],function(m2Moudle,m2){
+	function m1(i){
+		i+=10;
+		return m2Moudle.add(i);	
 	}
-	function changeB(i){
-		b = i;
-		console.log(b);
-	}
-	function bb(){
-		return b;
-	}
-	return{
-		a:a,
-		c:changeB,
-		bb:bb
-	}
+	console.log(m2);
+	return m1;
 });
 

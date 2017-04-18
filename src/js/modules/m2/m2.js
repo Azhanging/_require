@@ -1,7 +1,10 @@
-_require.define('m2',function(){
-	var _m1 = _require('./_require/src/js/modules/m1.js');
-	var b = _m1.a;
+_require.define('m2',['@js_1/js/modules/m3.js'],function(m3){
+	function add(i){
+		if(m3.greater(i)){			
+			return i++;
+		}
+	}
 	return {
-		b:b
+		add:add
 	}
 });
