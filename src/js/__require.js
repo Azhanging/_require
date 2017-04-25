@@ -7,9 +7,11 @@
 	
 	//http、https链接
 	var HTTP_PATH = /^http(s)?:\/\//;
-	//绝对路径
+	//相对路径
 	var ABSOLUTE_PATH = /^\//;
-	//别名路径
+	//绝对路径
+	var RELATIVE_PATH = /^\//;
+	//相对路径
 	var ALIAS_PATH = /^@[^\/]*/;
 	
 	//兼容性IE8
@@ -43,13 +45,13 @@
 		if(!getModules){
 		//获取的可能是id
 			try{				
-				return new _require.modules.installedModules[path].path();
+				return new _require.modules.installedModules[path].export();
 			}catch(e){
 				_require.error(1,path);
 			}
 		}else if(getModules) {
 			try{
-				return new getModules.path();
+				return new getModules.export();
 			}catch(e){
 				_require.error(1,path);
 			}
@@ -64,8 +66,6 @@
 		installedModules: {},
 		//模块列表
 		modulesLists: [],
-		//已经加载的模块列表
-		isLoadModules: {},
 		//执行use队列
 		installUse: [],
 		//最后加载成功的模块路径
@@ -157,7 +157,7 @@
 		if(HTTP_PATH.test(path)){
 			return path;
 		}else if(ABSOLUTE_PATH.test(path)){
-		//绝对路径
+		//相对对路径
 			return _require.baseUrl + path;
 		}else if(ALIAS_PATH.test(path)){
 		//别名路径
@@ -184,23 +184,23 @@
 			//当前模块添加到列表中
 			modules.modulesLists.push(path);
 			//设置当前模块加载状态
-			modules.isLoadModules[path] = false;
+			modules.installedModules[path] ={};
+			modules.installedModules[path].loaded = false;
 			//监听模块状态
 			(function(index, path) {
 				scriptElement.onload = function() {
 					//设置最后加载的模块已经模块路径
-					modules.installedModules[path] = {};
-					modules.installedModules[path].path = modules.lastLoadModuleHandler;
-					modules.installedModules[path].dep = modules.lastDepModules;
-
+					modules.installedModules[path].export = modules.lastLoadModuleHandler;
+					modules.installedModules[path].dep = modules.lastDepModules;					
 					//修改当前模块加载状态
-					modules.isLoadModules[path] = true;
+					modules.installedModules[path].loaded = true;
 					//书否存在设置id的模块
 					if(modules.lastLoadId) {
 						modules.installedModules[modules.lastLoadId] = {};
 						//设置id的模块
-						modules.installedModules[modules.lastLoadId].path = modules.lastLoadModuleHandler;
+						modules.installedModules[modules.lastLoadId].export = modules.lastLoadModuleHandler;
 						modules.installedModules[modules.lastLoadId].dep = modules.lastDepModules;
+						modules.installedModules[modules.lastLoadId].loaded = true;
 						//初始化id的选项
 						modules.lastLoadId = null;
 					}
@@ -236,9 +236,9 @@
 	//检测模块是否全部完毕
 	function isLoad() {
 		var modules = _require.modules;
-		var isLoad = Object.keys(modules.isLoadModules);
+		var isLoad = Object.keys(modules.installedModules);
 		for(var index = 0; index < isLoad.length; index++) {
-			if(modules.isLoadModules[isLoad[index]] === false) {
+			if(modules.installedModules[isLoad[index]].loaded === false) {
 				return false;
 			}
 		}
