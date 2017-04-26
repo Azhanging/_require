@@ -1,7 +1,11 @@
 _require.define('m3',function(){
-	var _m2 = _require('m2');
-	var b = _m2.b;
+	var greater = function(i){
+		if(i>0){
+			return true;
+		}
+		return false;
+	};
 	return {
-		b:b
+		greater:greater
 	}
-},"测试模块的注释内容3");   
+});   
