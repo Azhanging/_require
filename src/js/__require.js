@@ -128,6 +128,7 @@
 	//运行模块
 	_require.use = function(callback) {
 		_require.modules.installUse.push(callback);
+		isLoad();
 	};
 
 	//设置路径
@@ -147,6 +148,7 @@
 		loadModules(setUrl(newPaths));
 	}
 	
+	//获取路径
 	function getUrl(path){
 		//http链接
 		if(HTTP_PATH.test(path)){
@@ -162,34 +164,54 @@
 		var route = path.split('/');
 		var tempPath = '';
 		for(var index = 0;index < route.length;index++){
-			//相对路径
-			if(route[index] == '.'){
+			
+			//第一为绝对路径
+			if(route[index] === '' && index === 0){
+				_path = location.origin;	
+			}else if(route[index] === '.'){
+			//第一位为相对路径
+				if(index !== 0){
+					throw('错误的路径！');
+				}
 				_path += '';
 			}else if(route[index] == '..'){
+			//其他为上级目录
+				if(index == 0){
+					throw('错误的路径！');
+				}
 				_path = _path.split('/');
 				_path.pop();
 				_path = _path.join('/');
 			}else if(/^@/g.test(route[index])){
+			//别名路径
 				var alias = _require.alias[route[index].replace(/@/g,'')];
-				if(/\/$/.test(_path)){
-					if(/^\//.test(alias)){
-						tempPath = alias.substring(1);
-					}else{						
-						tempPath = alias;
-					}
-				}else{
-					if(/^\//.test(alias)){
-						tempPath = alias;
-					}else{						
-						tempPath = '/'+ alias;
-					}
-				}
+				hasSprit.end(_path)?
+				(hasSprit.start(alias)?(tempPath = alias.substring(1)):(tempPath = alias)):
+				(hasSprit.start(alias)?(tempPath = alias):(tempPath = '/'+ alias));
 				_path += tempPath;
 			}else{
-				_path += ('/' +route[index]); 
+			//最后的文件
+				hasSprit.end(_path)?
+				(_path += route[index]):
+				(_path += ('/' +route[index]));
 			}
 		}
 		return _path;
+	}
+	
+	var hasSprit = {
+		start:function(path){
+			if(/^\//.test(path)){
+				return true;
+			}
+			return false;
+		},
+		end:function(path){
+			if(/\/$/.test(path)){
+				return true;
+			}
+			return false;
+		}
 	}
 
 	//加载模块
@@ -217,9 +239,7 @@
 					//设置接口
 					setExport(path);
 					//检查当前模块是全部否完成
-					if(isLoad()) {
-						runUse();
-					}
+					isLoad();
 				};
 				scriptElement.onerror = function() {
 					_require.error(1, path);
@@ -273,7 +293,7 @@
 				return false;
 			}
 		}
-		return true;
+		runUse();
 	}
 
 	//运行use
