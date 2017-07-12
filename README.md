@@ -8,6 +8,13 @@
 	
 	handler{type:Function} 处理函数,如果存在依赖模块的定义，参数为返回的依赖模块；
 ***
+### _require.defineId([id,[dep],]handler): 动态加载id模块
+	id:{type:String} 模块的id，可选使用。
+	
+	dep:{type:Array} 依赖的模块，可选使用，可以是路径模块（未加载的会请求加载回来），也可以是id模块；
+	
+	handler{type:Function} 处理函数,如果存在依赖模块的定义，参数为返回的依赖模块；
+***
 ### _require.config(options)
 	baseUrl:{type:String} 模块加载的根路径
 	alias:{type:Object} 路径别名,设置paths路径可以以别名开头
