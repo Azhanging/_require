@@ -1,1 +1,1 @@
-_require.define("m3",function(){var e=_require("m2"),r=e.b;return{b:r}});
+_require.define("m3",function(){var r=function(r){return r>0};return{greater:r}});

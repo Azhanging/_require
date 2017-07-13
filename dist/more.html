@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="js/layer_mobile/need/layer.css"/>
+	</head>
+
+	<body>
+		<div id="app">
+			<ul style="display: none;" v-show="ready">
+				<li v-for="item in md">
+					<h4>{{item.title}}</h4>
+					<p>{{item.content}}</p>
+					<time>{{item.content}}</time>
+				</li>
+			</ul>
+			<button type="button" @click="more($event)">more</button>
+		</div>
+		<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+		<script src="js/public_module/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/layer_mobile/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/_require.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			_require.config({
+				baseUrl:location.origin,
+				paths:[
+					'./_require/src/js/public_module/more_data.js'
+				]
+			})
+			_require.use(function() {
+				_require('vue_more_data')({
+					el: '#app', //数据绑定节点
+					url: '',
+					data: {
+						page: 0 
+					},
+					isInit: true,  
+					noMoreMsg: '没有更多数据了' ,
+					isMoveLoad:{
+						type:'move',
+						state:true
+					}
+				});
+			});
+		</script>
+	</body>
+
+</html>

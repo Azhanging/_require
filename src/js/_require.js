@@ -64,18 +64,18 @@
 		if(!getModules) {
 			//获取的可能是id
 			try {
-				return new _require.modules.installedModules[path].export();
+				return new _require.modules.installedModules[path]._export_();
 			} catch(e) {
-				_require.error(1, path);
+				error(1, path);
 			}
 		} else if(getModules) {
 			try {
-				return new getModules.export();
+				return new getModules._export_();
 			} catch(e) {
-				_require.error(1, path);
+				error(1, path);
 			}
 		} else {
-			_require.error(1, path);
+			error(1, path);
 		}
 	}
 
@@ -84,7 +84,7 @@
 		//最后加载模块设置的id值
 		lastLoadId = null,
 		//最后加载模块依赖
-		lastDepModules = []
+		lastDepModules = [];
 
 	//模块信息
 	_require.modules = {
@@ -96,12 +96,23 @@
 		installUse: []
 	};
 
+	var configed = false;
+
 	//设置配置信息,并且初始化
 	_require.config = function(options) {
-		_require.baseUrl = options.baseUrl ? options.baseUrl : location.origin;
+		//不能重新配置模块
+		if(configed) {
+			console.warn('不能重复配置模块！');
+			return;
+		}
+
+		_require.baseUrl = options.baseUrl ? options.baseUrl : (location.origin || location.protocol + '//' + location.host);
+
 		_require.alias = options.alias;
 		//加载模块
 		loadModules(setUrl(options.paths));
+
+		configed = true;
 	}
 
 	//动态加载id模块
@@ -113,9 +124,15 @@
 		}
 		_require.define.apply(_require, arguments);
 		//设置接口
-		setExport();
+		set_export_();
 		//检查当前模块是全部否完成
 		isLoad();
+	}
+
+	//动态加载id模块
+	_require.loadModules = function(paths) {
+		if(isArr(paths)) loadModules(setUrl(paths));
+		else if(isStr(paths)) loadModules(setUrl([paths]));
 	}
 
 	//定义模块
@@ -138,7 +155,7 @@
 			dep = arg_0;
 			cb = arg_1;
 		}
-		
+
 		if(dep instanceof Array) {
 			depHandler(dep);
 			if(isIdModule) {
@@ -152,7 +169,7 @@
 				});
 				return cb.apply(this, deps);
 			};
-		} else if(typeof dep === 'function') {
+		} else if(isFn(dep)) {
 			//如果第一个参数是模块函数
 			if(isIdModule) {
 				lastLoadId = arg_0;
@@ -194,6 +211,22 @@
 		}
 	}
 
+	//检查路径是开始还是结束的
+	var hasSprit = {
+		start: function(path) {
+			if(/^\//.test(path)) {
+				return true;
+			}
+			return false;
+		},
+		end: function(path) {
+			if(/\/$/.test(path)) {
+				return true;
+			}
+			return false;
+		}
+	}
+
 	//处理路径解析
 	function urlResolve(path) {
 		var _path = _require.baseUrl;
@@ -203,18 +236,15 @@
 
 			//第一为绝对路径
 			if(route[index] === '' && index === 0) {
-				_path = location.origin;
+				_path = (location.origin || location.protocol + '//' + location.host);
 			} else if(route[index] === '.') {
 				//第一位为相对路径
 				if(index !== 0) {
-					_require.error(4);
+					error(4);
 				}
 				_path += '';
 			} else if(route[index] == '..') {
 				//其他为上级目录
-				if(index == 0) {
-					_require.error(4);
-				}
 				_path = _path.split('/');
 				_path.pop();
 				_path = _path.join('/');
@@ -233,22 +263,6 @@
 			}
 		}
 		return _path;
-	}
-
-	//检查路径是开始还是结束的
-	var hasSprit = {
-		start: function(path) {
-			if(/^\//.test(path)) {
-				return true;
-			}
-			return false;
-		},
-		end: function(path) {
-			if(/\/$/.test(path)) {
-				return true;
-			}
-			return false;
-		}
 	}
 
 	//加载模块
@@ -274,23 +288,23 @@
 			(function(index, path) {
 				scriptElement.onload = function() {
 					//设置接口
-					setExport(path);
+					set_export_(path);
 					//检查当前模块是全部否完成
 					isLoad();
 				};
 				scriptElement.onerror = function() {
-					_require.error(1, path);
+					error(1, path);
 				};
 			})(index, path);
 		}
 	}
 
 	//设置接口
-	function setExport(path) {
+	function set_export_(path) {
 		var installModules = _require.modules.installedModules;
 		//设置最后加载的模块已经模块路径
 		if(path) {
-			installModules[path].export = lastLoadModuleHandler;
+			installModules[path]._export_ = lastLoadModuleHandler;
 			installModules[path].dep = lastDepModules;
 			//修改当前模块加载状态
 			installModules[path].loaded = true;
@@ -299,7 +313,7 @@
 		if(lastLoadId) {
 			installModules[lastLoadId] = {};
 			//设置id的模块
-			installModules[lastLoadId].export = lastLoadModuleHandler;
+			installModules[lastLoadId]._export_ = lastLoadModuleHandler;
 			installModules[lastLoadId].dep = lastDepModules;
 			installModules[lastLoadId].loaded = true;
 			//初始化id的选项
@@ -345,10 +359,10 @@
 	}
 
 	//错误处理
-	_require.error = function(errorCode, msg) {
+	function error(errorCode, msg) {
 		switch(errorCode) {
 			case 1:
-				console.warn('加载' + msg + '加载有误');
+				console.warn('加载' + msg + '模块有误');
 				break;
 			case 2:
 				console.warn('存在相同' + msg + '模块');
