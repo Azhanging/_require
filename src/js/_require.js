@@ -1,3 +1,12 @@
+/*!
+ * 
+ * _require.js v1.0.5
+ * (c) 2016-2017 Blue
+ * https://github.com/azhanging/_require
+ * Released under the MIT License.
+ *      
+ */
+
 (function(global, factory) {
 	//不引入两次
 	if(!(typeof global._require == 'function')) {
@@ -32,6 +41,22 @@
 			}
 		}
 	})();
+
+	function isObj(obj) {
+		return obj instanceof Object && !(obj instanceof Array) && obj !== null;
+	}
+
+	function isArr(array) {
+		return array instanceof Array;
+	}
+
+	function isFn(fn) {
+		return typeof fn === 'function';
+	}
+
+	function isStr(string) {
+		return typeof string === 'string';
+	}
 
 	//获取模块
 	function _require(path) {
@@ -81,6 +106,11 @@
 
 	//动态加载id模块
 	_require.defineId = function() {
+		//动态的id模块必须定义id
+		if(!isStr(arguments[0])) {
+			this.error('', 3);
+			return;
+		}
 		_require.define.apply(_require, arguments);
 		//设置接口
 		setExport();
@@ -96,41 +126,38 @@
 			arg_1 = arguments[1],
 			arg_2 = arguments[2];
 
-		//默认设置了id
-		if(typeof arg_0 === 'string') {
-			//如果第二个参数是依赖，先设置依赖
-			if(arg_1 instanceof Array) {
-				depHandler(arg_1);
-				lastLoadId = arg_0;
-				lastDepModules = arg_1;
-				lastLoadModuleHandler = function() {
-					//设置依赖模块
-					var deps = arg_1.map(function(moduleName) {
-						return _require(moduleName);
-					});
-					return arg_2.apply(this, deps);
-				};
-			} else if(typeof arg_1 === 'function') {
-				//如果第二个参数是模块函数
-				lastLoadId = arg_0;
-				lastLoadModuleHandler = arg_1;
-			}
+		var dep = null,
+			cb = null;
+
+		//是否为id模块
+		var isIdModule = isStr(arg_0);
+		if(isIdModule) {
+			dep = arg_1;
+			cb = arg_2;
 		} else {
-			//非id模块
-			if(arg_0 instanceof Array) {
-				depHandler(arg_0);
-				lastDepModules = arg_0;
-				lastLoadModuleHandler = function() {
-					//设置依赖模块
-					var deps = arg_0.map(function(moduleName) {
-						return _require(moduleName);
-					});
-					return arg_1.apply(this, deps);
-				};
-			} else if(typeof arg_0 === 'function') {
-				//如果第二个参数是模块函数
-				lastLoadModuleHandler = arg_0;
+			dep = arg_0;
+			cb = arg_1;
+		}
+		
+		if(dep instanceof Array) {
+			depHandler(dep);
+			if(isIdModule) {
+				lastLoadId = arg_0;
 			}
+			lastDepModules = dep;
+			lastLoadModuleHandler = function() {
+				//设置依赖模块
+				var deps = dep.map(function(moduleName) {
+					return _require(moduleName);
+				});
+				return cb.apply(this, deps);
+			};
+		} else if(typeof dep === 'function') {
+			//如果第一个参数是模块函数
+			if(isIdModule) {
+				lastLoadId = arg_0;
+			}
+			lastLoadModuleHandler = dep;
 		}
 	}
 
@@ -208,6 +235,7 @@
 		return _path;
 	}
 
+	//检查路径是开始还是结束的
 	var hasSprit = {
 		start: function(path) {
 			if(/^\//.test(path)) {
@@ -257,6 +285,7 @@
 		}
 	}
 
+	//设置接口
 	function setExport(path) {
 		var installModules = _require.modules.installedModules;
 		//设置最后加载的模块已经模块路径
@@ -334,6 +363,8 @@
 				;
 		}
 	}
+
+	_require.version = 'v1.0.5';
 
 	return _require;
 });

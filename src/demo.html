@@ -10,9 +10,20 @@
 		<script src="js/_require.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/temp/../../m4.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
+			_require.defineId('name', ['/_require/src/js/modules/m3.js'], function() {
+				function name() {
+					console.log('name module');
+				}
+				return name;
+			});
+			
+			_require.use(function(){
+				_require('name')();	
+			});
+
 			setTimeout(function() {
 				_require.config({
-					baseUrl:location.origin + '/',
+					baseUrl: location.origin + '/',
 					alias: {
 						'js': '/_require/src/',
 						'js_1': '/_require/src/',
@@ -20,8 +31,7 @@
 						'modules': '/modules/'
 					},
 					paths: [
-						'@js/@js_2/modules/m1.js',
-						'./_require/../_require/src/@js_2/@modules/m1.js'
+						'@js/@js_2/modules/m1.js'
 					]
 				});
 
@@ -32,13 +42,13 @@
 					var m3 = _require('m3');
 					console.log(m3.greater(12121213));
 				});
+				
 			}, 1000);
-			
 		</script>
 		<script src="js/temp/../../m4.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			_require.config({
-				baseUrl:location.origin,
+				baseUrl: location.origin,
 				alias: {
 					'js': '/_require/src',
 					'js_1': '_require/src',
@@ -46,18 +56,17 @@
 					'modules': 'modules'
 				},
 				paths: [
-					'/@js/@js_2/modules/m1.js',
-					'./_require/../_require/src/@js_2/@modules/m1.js'
+					'/@js/@js_2/modules/m1.js'
 				]
 			});
 
-		_require.use(function() {
-			var a = _require('@js/@js_2/modules/m1.js');
-			console.log(a(1));
-			console.log(a(22));
-			var m3 = _require('m3');
-			console.log(m3.greater(123));
-		});
+			_require.use(function() {
+				var a = _require('@js/@js_2/modules/m1.js');
+				console.log(a(1));
+				console.log(a(22));
+				var m3 = _require('m3');
+				console.log(m3.greater(123));
+			});
 		</script>
 	</body>
 

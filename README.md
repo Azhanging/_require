@@ -8,7 +8,7 @@
 	
 	handler{type:Function} 处理函数,如果存在依赖模块的定义，参数为返回对应的依赖模块；
 ***
-### _require.defineId([id,[dep],]handler): 动态加载id模块
+### _require.defineId([id,handler): 动态加载id模块,动态的id模板不支持dep依赖加载
 	id:{type:String} 模块的id，可选使用。
 	
 	dep:{type:Array} 依赖的模块，可选使用，可以是路径模块（未加载的会请求加载回来），也可以是id模块；
