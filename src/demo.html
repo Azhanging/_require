@@ -8,7 +8,6 @@
 
 	<body>
 		<script src="js/_require.js" type="text/javascript" charset="utf-8"></script>
-		<script src="js/temp/../../m4.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			_require.defineId('name', ['/_require/src/js/modules/m3.js'], function() {
 				function name() {
@@ -36,13 +35,15 @@
 
 			_require.use(function() {
 				var a = _require('@js/@js_2/modules/m1.js');
+				console.log('fn');
+				console.log(a);
+				console.log('fn');
 				console.log(a(1111));
 				console.log(a(222222));
 				var m3 = _require('m3');
 				console.log(m3.greater(12121213));
 			});
 		</script>
-		<script src="js/temp/../../m4.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			_require.loadModules([
 				'@js/@js_2/modules/m1.js'

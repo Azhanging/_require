@@ -19,6 +19,19 @@
 
 	//兼容性IE8
 	(function() {
+
+		//兼容IE8中 的indexOf
+		if(!isFn(Array.prototype.indexOf)) {
+			Array.prototype.indexOf = function(val) {
+				for(var index = 0, len = this.length; index < len; index++) {
+					if(this[index] === val) {
+						return index;
+					}
+				}
+				return -1;
+			}
+		}
+
 		//不兼容IE8代理数据
 		if(navigator.userAgent.indexOf('MSIE 8.0') == -1) {
 			//共享变量
@@ -29,17 +42,32 @@
 				writable: false
 			});
 		}
-		//兼容IE8中 的indexOf
-		if(!Array.prototype.indexOf) {
-			Array.prototype.indexOf = function(val) {
-				for(var index = 0, len = this.length; index < len; index++) {
-					if(this[index] === val) {
-						return index;
-					}
+
+		//map
+		if(!isFn(Array.prototype.map)) {
+			Array.prototype.map = function(fn) {
+				var mapArr = [];
+				for(var i = 0; i < this.length; i++) {
+					mapArr.push(fn(this[i], i));
 				}
-				return -1;
+				return mapArr;
 			}
 		}
+
+		//filter
+		if(!isFn(Array.prototype.filter)) {
+			Array.prototype.filter = function(fn) {
+				var mapArr = [];
+				for(var i = 0; i < this.length; i++) {
+					var item = this[i];
+					if(fn(item, i)) {
+						mapArr.push(item);
+					}
+				}
+				return mapArr;
+			}
+		}
+
 	})();
 
 	function isObj(obj) {
@@ -124,7 +152,7 @@
 		}
 		_require.define.apply(_require, arguments);
 		//设置接口
-		set_export_();
+		set_export();
 		//检查当前模块是全部否完成
 		isLoad();
 	}
@@ -264,6 +292,9 @@
 		}
 		return _path;
 	}
+	
+	var scriptModules = [],
+		status = true;
 
 	//加载模块
 	function loadModules(paths) {
@@ -278,7 +309,6 @@
 			}
 			var scriptElement = document.createElement('script');
 			scriptElement.src = path;
-			document.getElementsByTagName('head')[0].appendChild(scriptElement);
 			//当前模块添加到列表中
 			modules.modulesLists.push(path);
 			//设置当前模块加载状态
@@ -287,20 +317,35 @@
 			//监听模块状态
 			(function(index, path) {
 				scriptElement.onload = function() {
+					status = true;
 					//设置接口
-					set_export_(path);
+					set_export(path);
 					//检查当前模块是全部否完成
 					isLoad();
+
+					if(scriptModules.length > 0) {
+						status = false;
+						scriptModules.shift()();
+					}
 				};
 				scriptElement.onerror = function() {
 					error(1, path);
 				};
 			})(index, path);
+
+			if(status) {
+				status = false;
+				document.getElementsByTagName('head')[0].appendChild(scriptElement);
+			} else {
+				scriptModules.push(function() {
+					document.getElementsByTagName('head')[0].appendChild(scriptElement)
+				});
+			}
 		}
 	}
 
 	//设置接口
-	function set_export_(path) {
+	function set_export(path) {
 		var installModules = _require.modules.installedModules;
 		//设置最后加载的模块已经模块路径
 		if(path) {
