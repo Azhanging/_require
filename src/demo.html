@@ -15,13 +15,13 @@
 				}
 				return name;
 			});
-			
-			_require.use(function(){
-				_require('name')();	
+
+			_require.use(function() {
+				_require('name')();
 			});
 
 			_require.config({
-				baseUrl: (location.origin || location.protocol + '//' + location.host) + '/_require',
+				baseUrl: ((location.origin || location.protocol + '//' + location.host)) + '/_require',
 				alias: {
 					'js': '/src/',
 					'js_1': '/src/',
@@ -29,15 +29,13 @@
 					'modules': '/modules/'
 				},
 				paths: [
+					'@js/@js_2/modules/m1.js',
 					'@js/@js_2/modules/m1.js'
 				]
 			});
 
 			_require.use(function() {
 				var a = _require('@js/@js_2/modules/m1.js');
-				console.log('fn');
-				console.log(a);
-				console.log('fn');
 				console.log(a(1111));
 				console.log(a(222222));
 				var m3 = _require('m3');
@@ -45,17 +43,21 @@
 			});
 		</script>
 		<script type="text/javascript">
-			_require.loadModules([
-				'@js/@js_2/modules/m1.js'
-			]);
-
 			_require.use(function() {
 				var a = _require('@js/@js_2/modules/m1.js');
-				console.log(a(1));
+				console.log(a(123456));
 				console.log(a(22));
 				var m3 = _require('m3');
 				console.log(m3.greater(123));
+				console.log(typeof _require('@js/@js_2/modules/m4.js'));
 			});
+			
+			_require.loadModules([
+				'@js/@js_2/modules/m4.js',
+				'@js/@js_2/modules/m5.js',
+				'@js/@js_2/modules/m6.js'
+			]);
+
 		</script>
 	</body>
 

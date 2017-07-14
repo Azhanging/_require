@@ -292,7 +292,7 @@
 		}
 		return _path;
 	}
-	
+
 	var scriptModules = [],
 		status = true;
 
@@ -315,8 +315,9 @@
 			modules.installedModules[path] = {};
 			modules.installedModules[path].loaded = false;
 			//监听模块状态
-			(function(index, path) {
-				scriptElement.onload = function() {
+			(function(index, path, scriptElement) {
+			    //处理scripr加载完毕后的处理
+				function scriptEventHandler() {
 					status = true;
 					//设置接口
 					set_export(path);
@@ -327,26 +328,34 @@
 						status = false;
 						scriptModules.shift()();
 					}
+				}
+
+				scriptElement.onload = function() {
+					scriptEventHandler();
 				};
 				scriptElement.onerror = function() {
 					error(1, path);
+					scriptEventHandler();
 				};
-			})(index, path);
 
-			if(status) {
-				status = false;
-				document.getElementsByTagName('head')[0].appendChild(scriptElement);
-			} else {
-				scriptModules.push(function() {
-					document.getElementsByTagName('head')[0].appendChild(scriptElement)
-				});
-			}
+				if(status) {
+					status = false;
+					document.getElementsByTagName('head')[0].appendChild(scriptElement);
+				} else {
+					scriptModules.push(function() {
+						document.getElementsByTagName('head')[0].appendChild(scriptElement)
+					});
+				}
+
+			})(index, path, scriptElement);
+
 		}
 	}
 
 	//设置接口
 	function set_export(path) {
 		var installModules = _require.modules.installedModules;
+
 		//设置最后加载的模块已经模块路径
 		if(path) {
 			installModules[path]._export_ = lastLoadModuleHandler;
@@ -354,16 +363,20 @@
 			//修改当前模块加载状态
 			installModules[path].loaded = true;
 		}
-		//书否存在设置id的模块
+		//是否存在设置id的模块
 		if(lastLoadId) {
 			installModules[lastLoadId] = {};
 			//设置id的模块
 			installModules[lastLoadId]._export_ = lastLoadModuleHandler;
 			installModules[lastLoadId].dep = lastDepModules;
 			installModules[lastLoadId].loaded = true;
-			//初始化id的选项
-			lastLoadId = null;
 		}
+
+		//初始化所有的及接口配置
+		lastLoadId = null;
+		lastLoadModuleHandler = function() {
+			return function() {}
+		};
 		lastDepModules = [];
 	}
 
