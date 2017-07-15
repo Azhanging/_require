@@ -28,6 +28,9 @@
 		
 ### _require.use(callback);
 	所有的模块加载完毕后，执行use中的回调函数；
+	
+### _require.getOrigin:
+	获取根路径
 
 ### G变量代理（不支持IE8）
 	例如：G['id'] = 1;

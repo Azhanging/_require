@@ -88,7 +88,9 @@
 
 	//获取模块
 	function _require(path) {
+		//获取路径模块
 		var getModules = _require.modules.installedModules[getUrl(path)];
+		//获取不到路径模块为id模块
 		if(!getModules) {
 			//获取的可能是id
 			try {
@@ -97,15 +99,22 @@
 				error(1, path);
 			}
 		} else if(getModules) {
+			//获取不到路径模块
 			try {
 				return new getModules._export_();
 			} catch(e) {
 				error(1, path);
 			}
 		} else {
+			//获取不到模块
 			error(1, path);
 		}
 	}
+
+	//获取根路径
+	_require.origin = (function() {
+		return(location.origin || location.protocol + '//' + location.host);
+	})();
 
 	//最后加载成功的模块路径
 	var lastLoadModuleHandler = null,
@@ -124,6 +133,7 @@
 		installUse: []
 	};
 
+	//存储是否配置了模块
 	var configed = false;
 
 	//设置配置信息,并且初始化
@@ -134,7 +144,7 @@
 			return;
 		}
 
-		_require.baseUrl = options.baseUrl ? options.baseUrl : (location.origin || location.protocol + '//' + location.host);
+		_require.baseUrl = options.baseUrl ? options.baseUrl : _require.origin;
 
 		_require.alias = options.alias;
 		//加载模块
@@ -176,7 +186,11 @@
 
 		//是否为id模块
 		var isIdModule = isStr(arg_0);
+
 		if(isIdModule) {
+			if(_require.modules.installedModules[arg_0]) {
+				error(2, arg_0);
+			}
 			dep = arg_1;
 			cb = arg_2;
 		} else {
@@ -184,6 +198,7 @@
 			cb = arg_1;
 		}
 
+		//设置id和非id的数据处理
 		if(dep instanceof Array) {
 			depHandler(dep);
 			if(isIdModule) {
@@ -261,10 +276,9 @@
 		var route = path.split('/');
 		var tempPath = '';
 		for(var index = 0; index < route.length; index++) {
-
 			//第一为绝对路径
 			if(route[index] === '' && index === 0) {
-				_path = (location.origin || location.protocol + '//' + location.host);
+				_path = _require.origin;
 			} else if(route[index] === '.') {
 				//第一位为相对路径
 				if(index !== 0) {
@@ -285,9 +299,7 @@
 				_path += tempPath;
 			} else {
 				//最后的文件
-				hasSprit.end(_path) ?
-					(_path += route[index]) :
-					(_path += ('/' + route[index]));
+				hasSprit.end(_path) ? (_path += route[index]) : (_path += ('/' + route[index]));
 			}
 		}
 		return _path;
@@ -316,7 +328,7 @@
 			modules.installedModules[path].loaded = false;
 			//监听模块状态
 			(function(index, path, scriptElement) {
-			    //处理scripr加载完毕后的处理
+				//处理scripr加载完毕后的处理
 				function scriptEventHandler() {
 					status = true;
 					//设置接口
