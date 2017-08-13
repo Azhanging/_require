@@ -8,28 +8,30 @@
 
 	<body>
 		<script src="js/_require.js" type="text/javascript" charset="utf-8"></script>
-		<script src="js/temp/../../m4.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
-			_require.defineId('name', ['/_require/src/js/modules/m3.js'], function() {
+			
+			_require.defineId('name', ['/_require/src/js/modules/m3.js'], function(m3) {
 				function name() {
 					console.log('name module');
 				}
+				console.log('m3：' + m3.greater(2313215465798465465));
 				return name;
 			});
-			
-			_require.use(function(){
-				_require('name')();	
+
+			_require.use(function() {
+				_require('name')();
 			});
 
 			_require.config({
-				baseUrl: location.origin + '/_require',
+				baseUrl: _require.origin + '/_require',
 				alias: {
-					'js': '/src/',
-					'js_1': '/src/',
-					'js_2': '/js/',
+					'js': 'src/',
+					'js_1': 'src/',
+					'js_2': 'js/',
 					'modules': '/modules/'
 				},
 				paths: [
+					'@js/@js_2/modules/m1.js',
 					'@js/@js_2/modules/m1.js'
 				]
 			});
@@ -42,19 +44,24 @@
 				console.log(m3.greater(12121213));
 			});
 		</script>
-		<script src="js/temp/../../m4.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
-			_require.loadModules([
-				'@js/@js_2/modules/m1.js'
-			]);
-
+			
 			_require.use(function() {
 				var a = _require('@js/@js_2/modules/m1.js');
-				console.log(a(1));
+				console.log(a(123456));
 				console.log(a(22));
 				var m3 = _require('m3');
 				console.log(m3.greater(123));
+				console.log(typeof _require('@js/@js_2/modules/m4.js'));
+				console.log(_require.modules.installedModules);
 			});
+			
+			_require.loadModules([
+				'@js/@js_2/modules/m4.js',
+				'@js/@js_2/modules/m5.js',
+				'@js/@js_2/modules/m6.js'
+			]);
+
 		</script>
 	</body>
 

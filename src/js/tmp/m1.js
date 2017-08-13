@@ -1,1 +1,1 @@
-_require.define(["@js/@js_2/modules/m2/m2.js","m2"],function(e,n){function o(n){return n+=10,e.add(n)}return console.log(n),o});
+_require.define("haha",["@js/@js_2/modules/m2/m2.js","m2"],function(e,n){function o(n){return n+=10,e.add(n)}return console.log(n===e),o}),_require.define("m10",["@js/@js_2/modules/m2/m2.js","m2"],function(e,n){function o(n){return n+=10,e.add(n)}return console.log(n===e),o});

@@ -1,10 +1,9 @@
 'use strict';
 
 var gulp = require('gulp'),
-	sass = require('gulp-sass'),
 	concat = require('gulp-concat'),
 	uglify = require('gulp-uglify'),
-	autoprefixer = require('gulp-autoprefixer'),
+	header = require('gulp-header'),
 	browsersync = require('browser-sync'),
 	del = require('del');
 
@@ -34,6 +33,18 @@ gulp.task('concat', function() {
 			base: 'src'
 		})
 		.pipe(uglify())
+		.pipe(header([
+            '/**',
+            '*',
+            '*',
+            '* _require.js v1.0.6',
+            '* (c) 2016-2017 Blue',
+            '* https://github.com/azhanging/_require',
+            '* Released under the MIT License.',
+            '*',
+            '*',
+            '**/', ''
+        ].join('\n')))
 		.pipe(gulp.dest(src.dist));
 
 	//压缩module
@@ -59,21 +70,6 @@ gulp.task('del', function() {
 	del.sync(src.del);
 });
 
-//htmlmin
-gulp.task('htmlmin', ['sass', 'css', ], function(cb) {
-	return gulp.src(src.html)
-		.pipe(gulp.dest(src.dist));
-});
-
-//server
-gulp.task('server', ['watch'], function() {
-	browsersync({
-		server: {
-			baseDir: './dist'
-		}
-	});
-});
-
 //watch fn
 var watch = function(type) {
 	gulp.watch(src.watch[type].path, function(ev) {
@@ -89,4 +85,4 @@ gulp.task('watch', function() {
 });
 
 //default
-gulp.task('default', ['del', 'other', 'watch', 'concat', 'server']);
+gulp.task('default', ['del', 'other', 'watch', 'concat']);

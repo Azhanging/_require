@@ -1,0 +1,1 @@
+_require.define(function(){var e=function(e){console.log(e)};return{get:e}});
